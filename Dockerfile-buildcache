@@ -1,0 +1,8 @@
+FROM openjdk:8
+ENV APP_HOME=/root/dev/intersperse
+WORKDIR $APP_HOME
+COPY build.gradle settings.gradle gradlew gradlew.bat $APP_HOME/
+COPY src $APP_HOME/src
+COPY gradle $APP_HOME/gradle
+# download dependencies
+RUN ./gradlew build

@@ -1,5 +1,6 @@
 package com.benjvi.interspersedweb
 
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 import org.springframework.http.MediaType
 import org.springframework.http.codec.multipart.FilePart
@@ -11,11 +12,15 @@ import org.springframework.web.reactive.function.server.body
 import reactor.core.publisher.Mono
 import java.io.File
 import java.util.concurrent.TimeUnit
+import java.util.UUID
 
 
 
 @Component
 class Handler() {
+
+    val inputFilesDir = "/tmp/input"
+    val outputFilesDir = "/tmp/output"
 
     fun helloWorld(req: ServerRequest): Mono<ServerResponse> {
         return ServerResponse.ok().contentType(MediaType.TEXT_PLAIN).body(Mono.just("Hello World!"))
@@ -24,18 +29,27 @@ class Handler() {
     fun uploadAudio(req: ServerRequest): Mono<ServerResponse> {
         // TODO: spring request handling fails when size > ~2GB
         return req.body(BodyExtractors.toMultipartData()).flatMap { parts ->
+            // TODO: uuid based on uploaded files so we can eliminate duplicate requests?
+            val reqID = UUID.randomUUID().leastSignificantBits
+            val outputAudioPath = String.format("%s/%d/", outputFilesDir, reqID)
             val map: Map<String, Part> = parts.toSingleValueMap()
 
             val filePartBase : FilePart = map["file"]!! as FilePart
-            filePartBase.transferTo( File("/tmp/audio-base"))
+            val inputBaseAudioPath = String.format("%s/%d/audio-base", inputFilesDir, reqID)
+            filePartBase.transferTo( File(inputBaseAudioPath))
 
+            val inputTgtAudioPath = String.format("%s/%d/audio-tgt", inputFilesDir, reqID)
             val filePartTgt : FilePart = map["file-2"]!! as FilePart
-            filePartTgt.transferTo( File("/tmp/audio-tgt"))
+            filePartTgt.transferTo( File(inputTgtAudioPath))
 
             // just for now (hopefully), invoke the python process on every request (!)
-            val ipconfig = ProcessBuilder().command("ipconfig").inheritIO().start()
-            val finished = ipconfig.waitFor(100, TimeUnit.SECONDS)
-            println("finished running ipconfig: "+ finished.toString())
+            val python = ProcessBuilder().command("python3", "interleaved/make_bilingual.py", inputBaseAudioPath, inputTgtAudioPath, outputAudioPath).inheritIO().start()
+
+            val finished = python.waitFor(100, TimeUnit.SECONDS)
+            if (!finished) {
+                return@flatMap ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Mono.just("Failed to complete audio processing"))
+            }
+            println("finished running python: "+ finished.toString())
 
 
             ServerResponse.ok().body(Mono.just("OK"))
