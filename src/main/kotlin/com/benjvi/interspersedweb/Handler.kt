@@ -32,16 +32,23 @@ class Handler() {
             // TODO: uuid based on uploaded files so we can eliminate duplicate requests?
             val reqID = UUID.randomUUID().leastSignificantBits
             val outputAudioPath = String.format("%s/%d/", outputFilesDir, reqID)
+            val outputAudioFolder = File(outputAudioPath)
+            outputAudioFolder.mkdirs()
+            val inputAudioFolder = File(String.format("%s/%d/", inputFilesDir, reqID))
+            inputAudioFolder.mkdirs()
+
             val map: Map<String, Part> = parts.toSingleValueMap()
 
+
             val filePartBase : FilePart = map["file"]!! as FilePart
-            val inputBaseAudioPath = String.format("%s/%d/audio-base", inputFilesDir, reqID)
+            val inputBaseAudioPath = String.format("%s/%d/audio-base.mp3", inputFilesDir, reqID)
             filePartBase.transferTo( File(inputBaseAudioPath))
 
-            val inputTgtAudioPath = String.format("%s/%d/audio-tgt", inputFilesDir, reqID)
+            val inputTgtAudioPath = String.format("%s/%d/audio-tgt.mp3", inputFilesDir, reqID)
             val filePartTgt : FilePart = map["file-2"]!! as FilePart
             filePartTgt.transferTo( File(inputTgtAudioPath))
 
+            println("started running python script to process audio for request: "+reqID.toString())
             // just for now (hopefully), invoke the python process on every request (!)
             val python = ProcessBuilder().command("python3", "interleaved/make_bilingual.py", inputBaseAudioPath, inputTgtAudioPath, outputAudioPath).inheritIO().start()
 
@@ -51,7 +58,7 @@ class Handler() {
             }
             println("finished running python: "+ finished.toString())
 
-
+            //TODO: load a link to download the file in the response
             ServerResponse.ok().body(Mono.just("OK"))
         }
     }
