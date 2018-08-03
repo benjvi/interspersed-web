@@ -13,6 +13,11 @@ import reactor.core.publisher.Mono
 import java.io.File
 import java.util.concurrent.TimeUnit
 import java.util.UUID
+import org.springframework.core.io.FileSystemResource
+import org.springframework.core.io.Resource
+import org.springframework.web.bind.annotation.PathVariable
+
+
 
 
 
@@ -58,8 +63,13 @@ class Handler() {
             }
             println("finished running python: "+ finished.toString())
 
-            //TODO: load a link to download the file in the response
-            ServerResponse.ok().body(Mono.just("OK"))
+            //TODO: render an actual link to download the file in the response
+            ServerResponse.ok().body(Mono.just("Processing succeeded. Download audio <a href=\"/download/%s\">here</a>".format(reqID)))
         }
+    }
+
+    fun downloadAudio(req: ServerRequest): Mono<ServerResponse> {
+        val reqId = req.pathVariable("reqId")
+        return ServerResponse.ok().body(Mono.just(FileSystemResource("%s/%s/audio-out.mp3".format(outputFilesDir, reqId))))
     }
 }
