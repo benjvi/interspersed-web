@@ -12,10 +12,13 @@ import org.springframework.web.reactive.function.server.body
 import reactor.core.publisher.Mono
 import java.io.File
 import java.util.concurrent.TimeUnit
-import java.util.UUID
 import org.springframework.core.io.FileSystemResource
 import org.springframework.core.io.Resource
 import org.springframework.web.bind.annotation.PathVariable
+import java.util.*
+import java.util.Collections.singletonMap
+
+
 
 
 
@@ -45,12 +48,12 @@ class Handler() {
             val map: Map<String, Part> = parts.toSingleValueMap()
 
 
-            val filePartBase : FilePart = map["file"]!! as FilePart
+            val filePartBase : FilePart = map["audio-base"]!! as FilePart
             val inputBaseAudioPath = String.format("%s/%d/audio-base.mp3", inputFilesDir, reqID)
             filePartBase.transferTo( File(inputBaseAudioPath))
 
             val inputTgtAudioPath = String.format("%s/%d/audio-tgt.mp3", inputFilesDir, reqID)
-            val filePartTgt : FilePart = map["file-2"]!! as FilePart
+            val filePartTgt : FilePart = map["audio-tgt"]!! as FilePart
             filePartTgt.transferTo( File(inputTgtAudioPath))
 
             println("started running python script to process audio for request: "+reqID.toString())
@@ -63,8 +66,12 @@ class Handler() {
             }
             println("finished running python: "+ finished.toString())
 
-            //TODO: render an actual link to download the file in the response
-            ServerResponse.ok().body(Mono.just("Processing succeeded. Download audio <a href=\"/download/%s\">here</a>".format(reqID)))
+
+            val model = HashMap<String, Any>()
+            model["reqID"] = reqID
+            model["audioFilenameBase"]  = filePartBase.filename()
+            model["audioFilenameTgt"] = filePartTgt.filename()
+            ServerResponse.ok().contentType(MediaType.TEXT_HTML).render("upload-confirmed", model)
         }
     }
 
