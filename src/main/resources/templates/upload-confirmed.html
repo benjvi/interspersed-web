@@ -10,7 +10,7 @@
 <body>
 <p th:text="'Created your composite audio track, with audio from ' + ${audioFilenameBase}
 + ' interspersed with audio from ' + ${audioFilenameTgt}" />
-<p>Download audio with <a th:href="@{/download/${reqID}}">this link</a></p>
+<p>Download audio with <a th:href="@{|/download/${reqID}|}">this link</a></p>
 <p>This link will remain active for one hour</p>
 </body>
 </html>

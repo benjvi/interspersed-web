@@ -4,8 +4,6 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.reactive.function.server.router
 import org.springframework.http.MediaType.*
-import com.benjvi.interspersedweb.Handler
-import org.springframework.web.reactive.function.server.ServerRequest
 
 @Configuration
 open class Router(private val mainHandler: Handler) {

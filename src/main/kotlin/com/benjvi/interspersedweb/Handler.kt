@@ -19,11 +19,6 @@ import java.util.*
 import java.util.Collections.singletonMap
 
 
-
-
-
-
-
 @Component
 class Handler() {
 
@@ -36,7 +31,7 @@ class Handler() {
 
     fun landingPage(req: ServerRequest): Mono<ServerResponse> {
         val model = HashMap<String, Any>()
-        ServerResponse.ok().contentType(MediaType.TEXT_HTML).render("index", model)
+        return ServerResponse.ok().contentType(MediaType.TEXT_HTML).render("index", model)
     }
 
     fun uploadAudio(req: ServerRequest): Mono<ServerResponse> {

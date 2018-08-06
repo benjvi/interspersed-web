@@ -1,9 +1,9 @@
-<form action="/upload/audio"
-      enctype="multipart/form-data" method="post">
-    <h2>Interleaved Audiobooks</h2>
-    <p>Given two audio files, we will divide them into chunks and intersperse the two audio files.</p>
-    <p>Provide one audio track in a language you now well, and one in a language you want to learn.
+<h2>Interleaved Audiobooks</h2>
+<p>Given two audio files, we will divide them into chunks and intersperse the two audio files.</p>
+<p>Provide one audio track in a language you now well, and one in a language you want to learn.
     The result will have short phrases immediately followed by their translations</p>
+<form th:action="@{/upload/audio}"
+      enctype="multipart/form-data" method="post">
 
     <div>
         <p>
@@ -15,7 +15,7 @@
             <input type="file" name="audio-tgt" size="40"/>
         </p>
         <div>
-            <input type="submit" value="Upload"/>
+            <input type="submit" value="Process"/>
         </div>
     </div>
 </form>
