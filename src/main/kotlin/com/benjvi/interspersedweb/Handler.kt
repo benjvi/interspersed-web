@@ -34,6 +34,11 @@ class Handler() {
         return ServerResponse.ok().contentType(MediaType.TEXT_PLAIN).body(Mono.just("Hello World!"))
     }
 
+    fun landingPage(req: ServerRequest): Mono<ServerResponse> {
+        val model = HashMap<String, Any>()
+        ServerResponse.ok().contentType(MediaType.TEXT_HTML).render("index", model)
+    }
+
     fun uploadAudio(req: ServerRequest): Mono<ServerResponse> {
         // TODO: spring request handling fails when size > ~2GB
         return req.body(BodyExtractors.toMultipartData()).flatMap { parts ->

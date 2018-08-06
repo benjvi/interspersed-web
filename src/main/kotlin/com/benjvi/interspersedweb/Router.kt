@@ -16,5 +16,6 @@ open class Router(private val mainHandler: Handler) {
         (accept(MULTIPART_FORM_DATA) and "/upload").nest {
             POST("/audio", mainHandler::uploadAudio)
         }
+        GET("/", mainHandler::landingPage)
     }
 }
