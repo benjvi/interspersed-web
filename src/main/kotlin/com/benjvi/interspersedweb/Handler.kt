@@ -75,6 +75,9 @@ class Handler() {
         }
     }
 
+    // TODO: add a list endpoint which gets all uploaded audio
+    // uses flux object so its properly reactive
+
     fun downloadAudio(req: ServerRequest): Mono<ServerResponse> {
         // TODO add a filename to the end of the URL here
         // so users get a sensible filename instead of a random id
