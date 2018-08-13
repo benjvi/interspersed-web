@@ -76,6 +76,9 @@ class Handler() {
     }
 
     fun downloadAudio(req: ServerRequest): Mono<ServerResponse> {
+        // TODO add a filename to the end of the URL here
+        // so users get a sensible filename instead of a random id
+        // https://www.nurkiewicz.com/2015/07/writing-download-server-part-vi.html
         val reqId = req.pathVariable("reqId")
         return ServerResponse.ok().body(Mono.just(FileSystemResource("%s/%s/audio-out.mp3".format(outputFilesDir, reqId))))
     }
